@@ -31,7 +31,7 @@ PYPI_CLASSIFIERS = [
       "Topic :: Security"
 ]
 
-ABOUT: Dict[str, str] = dict()
+ABOUT: Dict[str, str] = {}
 SOURCE_METADATA_PATH = BASE_DIR / PACKAGE_NAME / "__about__.py"
 with open(str(SOURCE_METADATA_PATH.resolve())) as f:
     exec(f.read(), ABOUT)

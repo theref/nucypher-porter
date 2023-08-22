@@ -42,9 +42,7 @@ class WebEmitter:
 
     @staticmethod
     def assemble_response(response: dict) -> dict:
-        response_data = {'result': response,
-                         'version': str(porter.__version__)}
-        return response_data
+        return {'result': response, 'version': str(porter.__version__)}
 
     def exception(self,
                   e,
@@ -72,8 +70,11 @@ class WebEmitter:
         assembled_response = self.assemble_response(response=json_error_response)
         serialized_response = WebEmitter.transport_serializer(assembled_response)
 
-        json_response = self.sink(response=serialized_response, status=response_code, content_type="application/json")
-        return json_response
+        return self.sink(
+            response=serialized_response,
+            status=response_code,
+            content_type="application/json",
+        )
 
     def respond(self, json_response) -> Response:
         assembled_response = self.assemble_response(response=json_response)

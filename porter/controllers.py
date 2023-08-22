@@ -42,8 +42,7 @@ class ControllerBase(ABC):
         params = serializer.load(request) # input validation will occur here.
         response = method(**params)  # < ---- INLET
 
-        response_data = serializer.dump(response)
-        return response_data
+        return serializer.dump(response)
 
 
 class InterfaceControlServer(ControllerBase):
@@ -188,12 +187,10 @@ class WebController(InterfaceControlServer):
             'failure_message': str(exception)
         }
         if exception.failures:
-            failures = []
-            for value, exc_info in exception.failures.items():
-                failures.append({
-                    'value': value,
-                    'error': str(exc_info[1])
-                })
+            failures = [
+                {'value': value, 'error': str(exc_info[1])}
+                for value, exc_info in exception.failures.items()
+            ]
             json_response['failures'] = failures
 
         return json_response
@@ -206,7 +203,7 @@ class WebController(InterfaceControlServer):
 
         try:
             request_data = control_request.data
-            request_body = json.loads(request_data) if request_data else dict()
+            request_body = json.loads(request_data) if request_data else {}
 
             # handle query string parameters
             if hasattr(control_request, 'args'):
@@ -219,9 +216,6 @@ class WebController(InterfaceControlServer):
 
             response = self._perform_action(action=method_name, request=request_body)
 
-        #
-        # Client Errors
-        #
         except _400_exceptions as e:
             __exception_code = 400
             return self.emitter.exception(
@@ -230,9 +224,6 @@ class WebController(InterfaceControlServer):
                 response_code=__exception_code,
                 error_message=WebController._captured_status_codes[__exception_code])
 
-        #
-        # Execution Errors
-        #
         except WorkerPoolException as e:
             # special case since WorkerPoolException contains multiple stack traces
             # - not ideal for returning from REST endpoints
@@ -248,9 +239,6 @@ class WebController(InterfaceControlServer):
                 response_code=__exception_code,
                 log_level='warn')
 
-        #
-        # Unhandled Server Errors
-        #
         except Exception as e:
             __exception_code = 500
             if self.crash_on_error:
@@ -261,9 +249,6 @@ class WebController(InterfaceControlServer):
                 response_code=__exception_code,
                 error_message=WebController._captured_status_codes[__exception_code])
 
-        #
-        # Send to WebEmitter
-        #
         else:
             self.log.debug(f"{method_name} [200 - OK]")
             return self.emitter.respond(json_response=response)

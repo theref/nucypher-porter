@@ -47,17 +47,13 @@ def test_alice_get_ursulas_schema(get_random_checksum_address):
 
     # only exclude
     updated_data = dict(required_data)
-    exclude_ursulas = []
-    for i in range(2):
-        exclude_ursulas.append(get_random_checksum_address())
+    exclude_ursulas = [get_random_checksum_address() for _ in range(2)]
     updated_data['exclude_ursulas'] = exclude_ursulas
     AliceGetUrsulas().load(updated_data)
 
     # only include
     updated_data = dict(required_data)
-    include_ursulas = []
-    for i in range(3):
-        include_ursulas.append(get_random_checksum_address())
+    include_ursulas = [get_random_checksum_address() for _ in range(3)]
     updated_data['include_ursulas'] = include_ursulas
     AliceGetUrsulas().load(updated_data)
 
@@ -282,12 +278,10 @@ def test_bob_retrieve_cfrags(federated_porter,
     error_message_template = "Retrieval Kit {} - Error Message {}"
     new_retrieval_outcomes_with_errors = []
     for i in range(num_retrieval_kits):
-        specific_kit_errors = dict()
-        for j in range(i):
-            # different number of errors for each kit; 1 error for kit 1, 2 errors for kit 2 etc.
-            specific_kit_errors[
-                get_random_checksum_address()
-            ] = error_message_template.format(i, j)
+        specific_kit_errors = {
+            get_random_checksum_address(): error_message_template.format(i, j)
+            for j in range(i)
+        }
         new_retrieval_outcomes_with_errors.append(
             Porter.RetrievalOutcome(
                 cfrags=retrieval_outcomes[i].cfrags, errors=specific_kit_errors
@@ -319,8 +313,7 @@ def make_header(brand: bytes, major: int, minor: int) -> bytes:
     assert len(brand) == 4
     major_bytes = major.to_bytes(2, 'big')
     minor_bytes = minor.to_bytes(2, 'big')
-    header = brand + major_bytes + minor_bytes
-    return header
+    return brand + major_bytes + minor_bytes
 
 
 def test_treasure_map_validation(enacted_federated_policy,

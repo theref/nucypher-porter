@@ -49,7 +49,7 @@ class Integer(BaseField, fields.Integer):
 
 class PositiveInteger(Integer):
     def _validate(self, value):
-        if not value > 0:
+        if value <= 0:
             raise InvalidInputData(f"{self.name} must be a positive integer.")
 
 
@@ -84,8 +84,7 @@ class JSON(BaseField, fields.Field):
                 f"Unexpected object type, {type(value)}; expected {self.expected_type}")
 
         try:
-            value_json = json.dumps(value)
-            return value_json
+            return json.dumps(value)
         except Exception as e:
             raise InvalidInputData(
                 f"Provided object type, {type(value)}, is not JSON serializable: {e}"

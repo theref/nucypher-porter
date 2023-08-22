@@ -77,8 +77,7 @@ def monkeysession():
 
 @pytest.fixture(scope='module')
 def click_runner():
-    runner = CliRunner()
-    yield runner
+    yield CliRunner()
 
 
 @pytest.fixture(scope='module')

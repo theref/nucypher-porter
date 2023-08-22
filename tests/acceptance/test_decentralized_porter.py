@@ -22,9 +22,10 @@ def test_get_ursulas(blockchain_porter, blockchain_ursulas):
 
     # exclude specific ursulas
     number_to_exclude = len(blockchain_ursulas_list) - 4
-    exclude_ursulas = []
-    for i in range(number_to_exclude):
-        exclude_ursulas.append(blockchain_ursulas_list[i].checksum_address)
+    exclude_ursulas = [
+        blockchain_ursulas_list[i].checksum_address
+        for i in range(number_to_exclude)
+    ]
     ursulas_info = blockchain_porter.get_ursulas(quantity=quantity,
                                                  exclude_ursulas=exclude_ursulas)
     returned_ursula_addresses = {ursula_info.checksum_address for ursula_info in ursulas_info}

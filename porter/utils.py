@@ -18,7 +18,7 @@ def generate_random_label() -> bytes:
     """Generates a random bytestring for use as a test label."""
     adjs = ('my', 'sesame-street', 'black', 'cute')
     nouns = ('lizard', 'super-secret', 'data', 'coffee')
-    combinations = list('-'.join((a, n)) for a in adjs for n in nouns)
+    combinations = ['-'.join((a, n)) for a in adjs for n in nouns]
     selection = random.choice(combinations)
     random_label = f'label://{selection}-{os.urandom(4).hex()}'
     return bytes(random_label, encoding='utf-8')
@@ -54,13 +54,14 @@ def retrieval_request_setup(enacted_policy,
     enrico = Enrico(policy_encrypting_key=enacted_policy.public_key)
     message_kits = []
     if specific_messages:
-        for message in specific_messages:
-            message_kits.append(enrico.encrypt_message(message))
+        message_kits.extend(
+            enrico.encrypt_message(message) for message in specific_messages
+        )
     else:
-        for i in range(num_random_messages):
+        for _ in range(num_random_messages):
             random_message = "".join(
-                random.choice(string.ascii_lowercase) for j in range(20)
-            ).encode()  # random message
+                random.choice(string.ascii_lowercase) for _ in range(20)
+            ).encode()
             message_kits.append(enrico.encrypt_message(random_message))
 
     encode_bytes = (lambda field, obj: field()._serialize(value=obj, attr=None, obj=None)) if encode_for_rest else (lambda field, obj: obj)

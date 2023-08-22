@@ -103,14 +103,17 @@ class AliceGetUrsulas(BaseSchema):
         #  be contacted at that time
         ursulas_to_include = data.get('include_ursulas')
         if ursulas_to_include and len(ursulas_to_include) > data['quantity']:
-            raise InvalidArgumentCombo(f"Ursulas to include is greater than quantity requested")
+            raise InvalidArgumentCombo(
+                "Ursulas to include is greater than quantity requested"
+            )
 
     @validates_schema
     def check_include_and_exclude_are_mutually_exclusive(self, data, **kwargs):
         ursulas_to_include = data.get('include_ursulas') or []
         ursulas_to_exclude = data.get('exclude_ursulas') or []
-        common_ursulas = set(ursulas_to_include).intersection(ursulas_to_exclude)
-        if len(common_ursulas) > 0:
+        if common_ursulas := set(ursulas_to_include).intersection(
+            ursulas_to_exclude
+        ):
             raise InvalidArgumentCombo(f"Ursulas to include and exclude are not mutually exclusive; "
                                        f"common entries {common_ursulas}")
 
